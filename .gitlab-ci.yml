@@ -1,0 +1,58 @@
+variables:
+  GIT_STRATEGY: none
+
+stages:
+  - deploy
+  - build_docker_image
+  - deploy_docker
+
+deploy_dev:
+  only:
+    - dev
+  stage: deploy
+  script:
+    - cd /home/someah/kemnaker-collection/presensi-project/presensi-kemnaker-web
+    - git pull origin dev
+    - docker-compose -f ../../presensi-project-try/docker-compose.yml up -d --build app-frontend
+    - docker image prune -af
+    - docker exec -t presensi-project-try-app-frontend-1 php artisan config:clear
+
+# Kemnaker Presensi Dev Section
+deploy_dev_kemnaker:
+  stage: deploy
+  script:
+    - cd /home/support/presensikemnaker-project/presensi-kemnaker-web
+    - git pull origin dev
+    - cat $env_dev > env.development
+    - docker-compose -f ../docker-compose-staging.yml up -d
+  tags:
+    - presensi-dev
+
+build_image_kemnaker:
+  stage: build_docker_image
+  script:
+    - cd /home/support/builds/presensikemnaker-project/presensi-kemnaker-web
+    - git pull origin main
+    - cat $env_prod > env.prod
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE":web_prod -f prod.Dockerfile .
+    - docker push "$CI_REGISTRY_IMAGE":web_prod
+  after_script:
+      - docker rmi "$CI_REGISTRY_IMAGE:"web_prod
+  only:
+    - main
+  tags:
+    - presensi-dev
+
+deploy_prod_kemnaker:
+  stage: deploy_docker
+  needs: ["build_image_kemnaker"]
+  script:
+    - cd /home/support/presensikemnaker-project
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker-compose pull app-frontend
+    - docker-compose up -d app-frontend
+  only:
+    - main
+  tags:
+    - presensi-prod
