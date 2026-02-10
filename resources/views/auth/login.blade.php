@@ -150,7 +150,7 @@
             $('#btnLoginAdmin').on('click', function(e){
                 e.preventDefault();
                 $('#login-input').show();
-                $('.modal-buttons').hide();
+                $('#btnLoginAdmin').hide();
                 $('#email').focus();
             });
             
