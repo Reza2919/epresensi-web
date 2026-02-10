@@ -12,13 +12,14 @@
     <title>Login - Presensi KEMNAKER</title>
     <link rel="apple-touch-icon" href="{{ asset('assets') }}/app-assets/images/ico/apple-icon-120.png">
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets') }}/app-assets/images/logo/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
     <!-- BEGIN: Vendor CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/app-assets/vendors/css/vendors.min.css">
     <!-- END: Vendor CSS-->
 
     <!-- BEGIN: Theme CSS-->
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/app-assets/login.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/app-assets/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/app-assets/css/bootstrap-extended.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/app-assets/css/colors.css">
@@ -34,79 +35,90 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/app-assets/css/plugins/extensions/ext-component-toastr.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/app-assets/css/pages/page-auth.css">
     <!-- END: Page CSS-->
-
-    <!-- BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/assets/css/style.css">
-    <!-- END: Custom CSS-->
-
 </head>
 <!-- END: Head-->
 
 <!-- BEGIN: Body-->
-
-<body class="vertical-layout vertical-menu-modern blank-page navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="blank-page">
-    <!-- BEGIN: Content-->
-    <div class="app-content content ">
-        <div class="content-overlay"></div>
-        <div class="header-navbar-shadow"></div>
-        <div class="content-wrapper">
-            <div class="content-header row">
-            </div>
-            <div class="content-body">
-                <div class="auth-wrapper auth-v2">
-                    <div class="auth-inner row m-0">
-                        <!-- Brand logo--><a class="brand-logo" href="javascript:void(0);">
-                            <img src="{{ asset('assets/app-assets/images/logo/logo-text.png') }}" alt="" srcset="" style="width: 200px">
-                        </a>
-                        <!-- /Brand logo-->
-                        <!-- Left Text-->
-                        <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-                            <div class="w-100 d-lg-flex align-items-center justify-content-center px-5"><img class="img-fluid" src="{{ asset('assets') }}/app-assets/images/pages/login-v2.svg" alt="Login V2" /></div>
+<body>
+    <div class="login-wrapper">
+        <!-- Full Background -->
+        <div class="login-background">
+            <img src="{{ asset('assets') }}/app-assets/images/pages/login-v3.png" alt="Office Background" class="bg-image">
+        </div>
+        
+        <!-- Centered Modal -->
+        <div class="login-modal">
+            <div class="modal-content">
+                <!-- Logo Section -->
+                <div class="modal-logo">
+                    <img src="{{ asset('assets/app-assets/images/logo/logo-text.png') }}" alt="Kementerian Ketenagakerjaan" class="logo-img">
+                </div>
+                
+                <!-- Title -->
+                <h1 class="modal-title">Presensi KEMNAKER</h1>
+                
+                <!-- Login Form -->
+                <form action="{{ url('/login') }}" method="POST" autocomplete="off" class="modal-form">
+                    @csrf
+                    
+                    <!-- Login Input Fields -->
+                    <div id="login-input" class="login-fields">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input 
+                                class="form-control" 
+                                id="email" 
+                                type="email" 
+                                name="email" 
+                                placeholder="Masukkan Email Anda" 
+                                tabindex="1"
+                                autofocus 
+                            />
                         </div>
-                        <!-- /Left Text-->
-                        <!-- Login-->
-                        <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
-                            <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
-                                <h2 class="card-title font-weight-bold mb-1">Presensi KEMNAKER <small>V 2.0.0</small></h2>
-                                <form class="auth-login-form mt-2" action="{{ url('/login') }}" method="POST" autocomplete="off">
-                                    @csrf
-                                    <div id="login-input">
-                                        <div class="form-group">
-                                            <label class="form-label" for="email">Email</label>
-                                            <input class="form-control" id="email" type="text" name="email" placeholder="Masukkan Email" aria-describedby="email" autofocus="" tabindex="1" />
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="d-flex justify-content-between">
-                                                <label for="password">Password</label>
-                                            </div>
-                                            <div class="input-group input-group-merge form-password-toggle">
-                                                <input class="form-control form-control-merge" id="password" type="password" name="password" placeholder="············" aria-describedby="password" tabindex="2" />
-                                                <div class="input-group-append"><span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span></div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" id="remember-me" type="checkbox" tabindex="3" />
-                                                <label class="custom-control-label" for="remember-me"> Remember Me</label>
-                                            </div>
-                                        </div>
-                                        <button class="btn btn-primary btn-block" tabindex="4" type="submit">Login</button>
-                                    </div>
-                                    <button class="btn btn-primary btn-block" tabindex="4" type="button" id="btnLoginAdmin">Login sebagai Admin</button>
-                                    <a href="{{$sso_url}}" class="btn btn-primary btn-block" tabindex="4" type="button" id="btnLoginTu">Login sebagai Tata Usaha</a>
-                                </form>
-                                {{-- <p class="text-center mt-2"><a href="{{ $sso_url }}"><span>&nbsp;Masuk menggunakan akun KEMNAKER</span></a></p> --}}
-                                <p class="text-center mt-2"><a href="https://account.kemnaker.go.id/auth/forgot-password" target="_blank"><span>Lupa Password?</span></a></p>
-                                <p class="text-center"><a href="{{ url('kebijakan-privasi') }}" target="_blank"><span>&nbsp;Kebijakan Privasi</span></a></p>
-                            </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input 
+                                class="form-control" 
+                                id="password" 
+                                type="password" 
+                                name="password" 
+                                placeholder="Masukkan Password" 
+                                tabindex="2"
+                            />
                         </div>
-                        <!-- /Login-->
+                        
+                        <div class="form-group">
+                            <label style="margin-bottom: 0;">
+                                <input type="checkbox" name="remember" id="remember-me" tabindex="3" style="margin-right: 8px;">
+                                <span style="font-weight: 400; font-size: 13px;">Ingat Saya</span>
+                            </label>
+                        </div>
+                        
+                        <button class="btn-modal btn-submit" tabindex="4" type="submit">
+                            Log In
+                        </button>
                     </div>
+                    
+                    <!-- Role Selection Buttons -->
+                    <div class="modal-buttons">
+                        <button class="btn-modal btn-admin" tabindex="4" type="button" id="btnLoginAdmin">
+                            Log In Sebagai Admin
+                        </button>
+                        <button class="btn-modal btn-tata-usaha" tabindex="4" id="btnLoginTu" onclick="window.location.href='{{$sso_url}}'">
+                            Log In Sebagai Tata Usaha
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Footer Links -->
+                <div class="modal-footer">
+                    <a href="https://account.kemnaker.go.id/auth/forgot-password" target="_blank">Lupa Kata Sandi?</a>
+                    <a href="{{ url('kebijakan-privasi') }}" target="_blank">Kebijakan dan Privasi</a>
                 </div>
             </div>
         </div>
     </div>
-    <!-- END: Content-->
 
 
     <!-- BEGIN: Vendor JS-->
@@ -133,16 +145,21 @@
 
     <script>
         $(document).ready(function () {
-            $('#login-input').hide()
-            $('#btnLoginAdmin').on('click',function(){
-                $('#login-input').show()
-                $(this).hide()
-            })
-            $('#btnLoginTu').on('click',function(){
-                $('#login-input').hide()
-                $('#btnLoginAdmin').show()
-            })
+            $('#login-input').hide();
+            
+            $('#btnLoginAdmin').on('click', function(e){
+                e.preventDefault();
+                $('#login-input').show();
+                $('.modal-buttons').hide();
+                $('#email').focus();
+            });
+            
+            $('#btnLoginTu').on('click', function(e){
+                e.preventDefault();
+                // This button links directly to SSO
+            });
         });
+        
         $(window).on('load', function() {
             if (feather) {
                 feather.replace({
@@ -170,8 +187,7 @@
                     }
                 );
             @endif
-
-        })
+        });
     </script>
 </body>
 <!-- END: Body-->
