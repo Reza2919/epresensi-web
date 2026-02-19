@@ -220,3 +220,86 @@ body {
         top: 0;
     }
 }
+
+/* Rekap Presensi card */
+.rekap-presensi-card {
+    border-radius: 24px;
+    box-shadow: 0 10px 24px rgba(28, 45, 70, 0.12);
+    border: none;
+}
+
+.rekap-presensi-card .card-body {
+    padding: 2rem 2.25rem;
+}
+
+.rekap-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.rekap-title h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2a44;
+    margin-bottom: 0.4rem;
+}
+
+.rekap-title p {
+    margin-bottom: 0;
+    color: #606a80;
+}
+
+.rekap-dates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.rekap-date label {
+    font-weight: 600;
+    color: #4b556b;
+    margin-bottom: 0.6rem;
+}
+
+.rekap-input {
+    position: relative;
+}
+
+.rekap-input .form-control {
+    height: 54px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(28, 45, 70, 0.12);
+    border: 1px solid rgba(31, 42, 68, 0.12);
+    padding-right: 2.75rem;
+    font-size: 1rem;
+}
+
+.rekap-input__icon {
+    position: absolute;
+    right: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4b556b;
+    width: 20px;
+    height: 20px;
+}
+
+.rekap-grid {
+    row-gap: 1rem;
+}
+
+@media (max-width: 767.98px) {
+    .rekap-dates {
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .rekap-presensi-card .card-body {
+        padding: 1.5rem;
+    }
+}

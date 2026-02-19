@@ -1,10 +1,7 @@
 @php
-    $user = session('userdata')
+    $user = session('userdata');
 @endphp
-@php
-    $userRoleLabel = @$user->role ? ucfirst($user->role) : 'Administrator';
-    $userSatkerLabel = @$user->satker ?? 'Admin';
-@endphp
+
 <nav class="header-navbar navbar navbar-expand-lg align-items-center navbar-dark navbar-shadow app-topbar">
     <div class="navbar-container d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
@@ -20,8 +17,8 @@
             <li class="nav-item dropdown dropdown-user app-user-dropdown">
                 <a class="nav-link dropdown-toggle app-user-toggle d-flex align-items-center" id="dropdown-user" href="javascript:void(0);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="app-user__meta d-none d-sm-flex">
-                        <span class="app-user__role">{{ $userRoleLabel }}</span>
-                        <span class="app-user__name">{{ $userSatkerLabel }}</span>
+                        <span class="app-user__role">{{ @$user->nama }}</span>
+                        <span class="app-user__name">{{ @$user->satker ?? 'Admin'}}</span>
                     </div>
                     <span class="avatar app-user__avatar">
                         <img class="round" src="{{ @$user->foto ?? asset('assets/app-assets/images/profile/default-user.jpg') }}" alt="avatar" height="44" width="44">
