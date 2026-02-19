@@ -1,33 +1,48 @@
 @php
     $user = session('userdata')
 @endphp
-<nav class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-dark navbar-shadow bg-primary">
-    <div class="navbar-container d-flex content">
-        <div class="bookmark-wrapper d-flex align-items-center">
-            <ul class="nav navbar-nav d-xl-none">
-                <li class="nav-item"><a class="nav-link menu-toggle" href="javascript:void(0);"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu ficon"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></a></li>
-            </ul>
+@php
+    $userRoleLabel = @$user->role ? ucfirst($user->role) : 'Administrator';
+    $userSatkerLabel = @$user->satker ?? 'Admin';
+@endphp
+<nav class="header-navbar navbar navbar-expand-lg align-items-center navbar-dark navbar-shadow app-topbar">
+    <div class="navbar-container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <a class="nav-link d-xl-none mr-1 menu-toggle" href="javascript:void(0);">
+                <i data-feather="menu"></i>
+            </a>
+            <a class="app-brand d-flex align-items-center" href="{{ url('/') }}">
+                <img class="app-brand__logo" src="{{ asset('assets/app-assets/images/logo/logo.png') }}" alt="e-Presensi logo">
+                <span class="app-brand__text">e-Presensi</span>
+            </a>
         </div>
-        <ul class="nav navbar-nav align-items-center ml-auto">
-
-            <li class="nav-item dropdown dropdown-user"><a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="javascript:void(0);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <div class="user-nav d-sm-flex d-none"><span class="user-name font-weight-bolder">{{ @$user->nama }}</span><span class="user-status">{{ @$user->satker ?? 'Admin' }}</span></div><span class="avatar"><img class="round" src="{{ @$user->foto ?? asset('assets/app-assets/images/profile/default-user.jpg') }}" alt="avatar" height="40" width="40" style="object-fit: cover;"><span class="avatar-status-online"></span></span>
+        <ul class="nav navbar-nav align-items-center app-user-nav">
+            <li class="nav-item dropdown dropdown-user app-user-dropdown">
+                <a class="nav-link dropdown-toggle app-user-toggle d-flex align-items-center" id="dropdown-user" href="javascript:void(0);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div class="app-user__meta d-none d-sm-flex">
+                        <span class="app-user__role">{{ $userRoleLabel }}</span>
+                        <span class="app-user__name">{{ $userSatkerLabel }}</span>
+                    </div>
+                    <span class="avatar app-user__avatar">
+                        <img class="round" src="{{ @$user->foto ?? asset('assets/app-assets/images/profile/default-user.jpg') }}" alt="avatar" height="44" width="44">
+                        <span class="avatar-status-online"></span>
+                    </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown-user">
                     <a class="dropdown-item" href="{{ route('profil') }}"><i class="mr-50" data-feather="user"></i> Profil</a>
                     <a class="dropdown-item" href="{{ url('faq') }}"><i class="mr-50" data-feather="help-circle"></i> FAQ</a>
                     @if($user->role == 'admin')
-                        <a class="dropdown-item"  href="{{ url('/profil') }}"><i class="mr-50" data-feather="key"></i> Ganti Password</a>
+                        <a class="dropdown-item" href="{{ url('/profil') }}"><i class="mr-50" data-feather="key"></i> Ganti Password</a>
                     @else
-                        <a class="dropdown-item"  href="https://account.kemnaker.go.id/settings/security"><i class="mr-50" data-feather="key"></i> Ganti Password</a>
+                        <a class="dropdown-item" href="https://account.kemnaker.go.id/settings/security"><i class="mr-50" data-feather="key"></i> Ganti Password</a>
                     @endif
-                    <a class="dropdown-item"  href="{{ url('logout') }}"><i class="mr-50" data-feather="power"></i> Logout</a>
+                    <a class="dropdown-item" href="{{ url('logout') }}"><i class="mr-50" data-feather="power"></i> Logout</a>
                 </div>
             </li>
         </ul>
     </div>
 </nav>
-<ul class="main-search-list-defaultlist d-none">
+{{-- <ul class="main-search-list-defaultlist d-none">
     <li class="d-flex align-items-center"><a href="javascript:void(0);">
             <h6 class="section-label mt-75 mb-0">Files</h6>
         </a></li>
@@ -98,7 +113,7 @@
                 </div>
             </div>
         </a></li>
-</ul>
+</ul> --}}
 <ul class="main-search-list-defaultlist-other-list d-none">
     <li class="auto-suggestion justify-content-between"><a class="d-flex align-items-center justify-content-between w-100 py-50">
             <div class="d-flex justify-content-start"><span class="mr-75" data-feather="alert-circle"></span><span>No results found.</span></div>

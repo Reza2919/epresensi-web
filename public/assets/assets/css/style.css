@@ -9,3 +9,214 @@ NOTE:
 ------
 PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
 WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+:root {
+    --app-primary: #0f2f4d;
+    --app-primary-contrast: #ffffff;
+    --app-surface: #f4f6fb;
+    --app-sidebar-bg: #f8f9fc;
+    --app-sidebar-text: #3a4560;
+    --app-sidebar-active: #243b5a;
+    --app-sidebar-active-text: #ffffff;
+    --app-shadow: 0 8px 20px rgba(23, 35, 61, 0.12);
+    --app-header-height: 64px;
+    --app-sidebar-gap: 16px;
+}
+
+body {
+    background-color: var(--app-surface);
+}
+
+.app-topbar {
+    background: var(--app-primary);
+    padding: 0.4rem 2rem;
+    border-radius: 0;
+    min-height: var(--app-header-height);
+    box-shadow: 0 6px 14px rgba(11, 30, 50, 0.2);
+}
+
+/* Force header sizing regardless of template defaults */
+.header-navbar.app-topbar {
+    height: var(--app-header-height) !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1030 !important;
+}
+
+.header-navbar.app-topbar .navbar-container {
+    height: var(--app-header-height) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.header-navbar.app-topbar.floating-nav {
+    margin: 0 !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+}
+
+.app-brand {
+    color: var(--app-primary-contrast);
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+.app-brand__logo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.app-brand__text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: var(--app-primary-contrast);
+}
+
+.app-user-toggle {
+    gap: 0.75rem;
+}
+
+.app-user-nav {
+    margin-left: auto;
+}
+
+.app-user-dropdown {
+    display: flex;
+    align-items: center;
+}
+
+.app-user__meta {
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 0.75rem;
+    color: var(--app-primary-contrast);
+    line-height: 1.2;
+}
+
+.app-user__role {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.app-user__name {
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+.app-user__avatar img {
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    height: 36px;
+    width: 36px;
+}
+
+.app-sidebar {
+    background: var(--app-sidebar-bg);
+    border-radius: 20px;
+    margin: 0 0 0 var(--app-sidebar-gap);
+    top: calc(var(--app-header-height) + var(--app-sidebar-gap));
+    height: calc(100% - var(--app-header-height) - (var(--app-sidebar-gap) * 2));
+    box-shadow: var(--app-shadow);
+    border: 1px solid rgba(15, 47, 77, 0.08);
+}
+
+/* Force sidebar below header (template uses fixed positioning) */
+.main-menu.app-sidebar {
+    top: calc(var(--app-header-height) + var(--app-sidebar-gap)) !important;
+}
+
+.main-menu.app-sidebar.menu-fixed {
+    height: calc(100% - var(--app-header-height) - (var(--app-sidebar-gap) * 2)) !important;
+}
+
+.app-sidebar .main-menu-content {
+    padding: 1.25rem 0.75rem;
+}
+
+.app-sidebar .navigation-header {
+    display: none;
+}
+
+.app-sidebar .navigation li.nav-item > a {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    margin: 0.2rem 0;
+    color: var(--app-sidebar-text);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.app-sidebar .navigation li.nav-item > a i,
+.app-sidebar .navigation li.nav-item > a svg {
+    color: var(--app-sidebar-text);
+}
+
+.app-sidebar .navigation li.nav-item > a::after {
+    content: "";
+    margin-left: auto;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    transform: rotate(45deg);
+    opacity: 0.55;
+}
+
+.app-sidebar .navigation li.nav-item > a:hover {
+    background: rgba(36, 59, 90, 0.12);
+}
+
+.app-sidebar .navigation li.nav-item.active > a {
+    background: var(--app-sidebar-active);
+    color: var(--app-sidebar-active-text);
+    box-shadow: 0 8px 18px rgba(36, 59, 90, 0.28);
+}
+
+.app-sidebar .navigation li.nav-item.active > a::after {
+    opacity: 0.8;
+}
+
+.app-sidebar .navigation li.nav-item.active > a i,
+.app-sidebar .navigation li.nav-item.active > a svg {
+    color: var(--app-sidebar-active-text);
+}
+
+.app-content.content {
+    padding-top: calc(var(--app-header-height) + 1.5rem);
+}
+
+/* Align top of sidebar and main content under header */
+.app-content.content,
+.app-sidebar {
+    margin-top: 0;
+}
+
+/* Force same top offset for content and sidebar */
+.app-content.content {
+    margin-top: 0 !important;
+    padding-top: calc(var(--app-header-height) + var(--app-sidebar-gap)) !important;
+}
+
+.header-navbar-shadow {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .app-topbar {
+        padding: 0.6rem 1rem;
+    }
+
+    .app-sidebar {
+        margin: 0;
+        border-radius: 0;
+        height: 100%;
+        top: 0;
+    }
+}
