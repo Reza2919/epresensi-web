@@ -17,7 +17,7 @@ class API
                 $header['Authorization'] = 'Bearer ' . session('token');
             }
 
-            $baseUrl = env('API_URL', 'localhost:2400/');
+            $baseUrl = config('services.api_url', 'http://localhost:2400/');
 
 
             self::$client = new Client([

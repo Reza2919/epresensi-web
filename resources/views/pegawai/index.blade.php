@@ -35,7 +35,7 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Filter</h4>
-                    
+                    <a href="{{ url('pegawai/create') }}" class="btn btn-primary"><i data-feather="plus"></i> Tambah Pegawai</a>
                     <div class="heading-elements">
                         <ul class="list-inline mb-0">
                             <li>

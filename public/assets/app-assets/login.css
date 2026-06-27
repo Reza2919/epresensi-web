@@ -1,0 +1,256 @@
+/* ============================================
+    Login Page Styles - Full Screen Modal Design
+    Presensi KEMNAKER
+    ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: #ffffff;
+}
+
+/* ============================================
+    Login Wrapper & Background
+    ============================================ */
+
+.login-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.login-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============================================
+    Modal Container
+    ============================================ */
+
+.login-modal {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 25px !important;
+    padding: 30px 65px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    width: 450px !important;
+    max-width: 480px !important;
+    text-align: center;
+}
+
+/* ============================================
+    Logo Section
+    ============================================ */
+
+.modal-logo {
+    margin-bottom: 30px;
+}
+
+.logo-img {
+    height: 70px;
+    object-fit: contain;
+}
+
+/* ============================================
+    Title
+    ============================================ */
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 15px !important;
+    text-transform: uppercase;
+    letter-spacing: 0px;
+}
+
+/* ============================================
+    Form Elements
+    ============================================ */
+
+.modal-form {
+    width: 100%;
+}
+
+.login-fields {
+    display: none;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    outline: none;
+}
+
+/* ============================================
+    Buttons
+    ============================================ */
+
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.btn-modal {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.btn-admin,
+.btn-tata-usaha {
+    background: #1a3a5c;
+    color: #ffffff;
+}
+
+.btn-admin:hover,
+.btn-tata-usaha:hover {
+    background: #0f2844;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(26, 58, 92, 0.35);
+}
+
+.btn-submit {
+    background: #1a3a5c;
+    color: #ffffff;
+}
+
+.btn-submit:hover {
+    background: #1a3a5c;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 102, 204, 0.35);
+}
+
+/* ============================================
+    Footer Links
+    ============================================ */
+
+.modal-footer {
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    border-top: 1px solid #ffffff;
+}
+
+.modal-footer a {
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.modal-footer a:hover {
+    color: #eeeeee;
+    text-decoration: underline;
+}
+
+#login-input {
+    display: none;
+}
+
+/* ============================================
+    Responsive Design
+    ============================================ */
+
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 40px 30px;
+        max-width: 100%;
+        border-radius: 20px;
+    }
+    
+    .modal-title {
+        font-size: 18px;
+        margin-bottom: 25px;
+    }
+    
+    .logo-img {
+        height: 50px;
+    }
+    
+    .btn-modal {
+        font-size: 13px;
+        padding: 12px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 30px 20px;
+    }
+    
+    .modal-title {
+        font-size: 18px;
+    }
+    
+    .login-modal {
+        padding: 10px;
+    }
+}

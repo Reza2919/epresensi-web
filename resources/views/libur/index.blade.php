@@ -21,7 +21,7 @@
                 <div class="card-header">
                     <h4 class="card-title">Data Libur</h4>
                     <div class="float-right">
-                        <a href="#" class="btn btn-success btn-sm btn-sync" type="button"><i data-feather="radio"></i> Sinkronisasi Hari Libur</a>
+                      <a href="#" class="btn btn-success btn-sm btn-sync" type="button"> <i data-feather="radio"></i> Sinkronisasi Hari Libur</a>
                         <a href="{{ url('libur/create') }}" class="btn btn-primary btn-sm" type="button"><i data-feather="plus"></i> Tambah Libur</a>
                     </div>
                 </div>
@@ -110,22 +110,22 @@
         })
 
         $(document).on('click', '.btn-sync', () => {
-           $('#sync-modal').modal("show")
-            let holidayTable = $('.holiday-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ordering: false,
-                searching: false,
-                paging: false,
-                ajax: {
-                    url: '{{ url("api/get-libur/google-calendar") }}',
-                    type: 'GET',
-                },
-                drawCallback: function( settings ) {
-                    feather.replace()
-                }
-            })
-        })
+   $('#sync-modal').modal("show")
+    let holidayTable = $('.holiday-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ordering: false,
+        searching: false,
+        paging: false,
+        ajax: {
+            url: '{{ url("api/get-libur/google-calendar") }}',
+            type: 'GET',
+        },
+        drawCallback: function( settings ) {
+            feather.replace()
+        }
+    })
+})
         $(document).on('click', '#store-libur', (e) => {
             let url = $(this).data('url')
             e.preventDefault()
@@ -186,46 +186,8 @@
                 }
             })
         })
-        $(document).on('click', '.btn-delete', function(e){
-            e.preventDefault()
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Anda tidak dapat mengembalikan data yang akan dihapus!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, saya yakin!',
-                cancelButtonText: 'Batalkan!'
-            }).then((result) => {
-            if (result.value) {
-                url = $(this).attr('href')
-                $.ajax({
-                    url: url,
-                    method: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    }
-                }).then(function(res){
-                    if(res.error){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan pada server!'
-                        })
-                    } else {
-                        table.ajax.reload()
-                        Swal.fire(
-                            'Deleted!',
-                            'Data berhasil dihapus.',
-                            'success'
-                        )
-                    }
-                })
-            }
-            })
-        })
-    });
+      
+});
 </script>
 @include('layouts.alerts')
 @endpush

@@ -61,31 +61,31 @@ crossorigin=""/>
             </div>
         </div>
         <div class="col-lg-8 col-md-8 col-12">
-            <div class="card card-statistics">
-                <div class="card-body statistics-body">
-                    <div class="row">
-                        <div class="col-md-6 col-xs-12">
-                            <h4>Rekap Presensi</h4>
+            <div class="card rekap-presensi-card">
+                <div class="card-body">
+                    <div class="rekap-header">
+                        <div class="rekap-title">
+                            <h2>Rekap Presensi</h2>
                             <p>Rekap Presensi Pegawai <span class="nama_satker"></span></p>
                         </div>
-                        <div class="col-md-3 col-xs-12">
-                            <div class="form-group">
-                              <label for="">Dari Tanggal</label>
-                              <input type="date"
-                                class="form-control" name="chart_date_start" id="chart_date_start" aria-describedby="helpId" placeholder="" value="{{ \Carbon\Carbon::now()->subDays(7)->format('Y-m-d') }}">
+                        <div class="rekap-dates">
+                            <div class="rekap-date">
+                                <label for="chart_date_start">Dari Tanggal</label>
+                                <div class="rekap-input">
+                                    <input type="date" class="form-control" name="chart_date_start" id="chart_date_start" aria-describedby="helpId" placeholder="" value="{{ \Carbon\Carbon::now()->subDays(7)->format('Y-m-d') }}">
+                                    <span class="rekap-input__icon"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3 col-xs-12">
-                            <div class="form-group">
-                              <label for="">Sampai Tanggal</label>
-                              <input type="date"
-                                class="form-control" name="chart_date_end" id="chart_date_end" aria-describedby="helpId" placeholder="" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                            <div class="rekap-date">
+                                <label for="chart_date_end">Mulai tanggal</label>
+                                <div class="rekap-input">
+                                    <input type="date" class="form-control" name="chart_date_end" id="chart_date_end" aria-describedby="helpId" placeholder="" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                    <span class="rekap-input__icon"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row" id="statistic">
-                        
-                    </div>
+                    <div class="row rekap-grid" id="statistic"></div>
                 </div>
             </div>
         </div>
@@ -100,8 +100,8 @@ crossorigin=""/>
                     </div>
                     <div>
                         <canvas id="trendChart" style="height: 400px"></canvas>
-                    </div>                      
-                </div> 
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-lg-12">
@@ -127,10 +127,10 @@ crossorigin=""/>
                             </div>
                         </div>
                     </div>
-                </div> 
+                </div>
             </div>
         </div>
-        
+
     </div>
 </section>
 <!-- Dashboard Analytics end -->
@@ -143,7 +143,7 @@ crossorigin=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
 <script>
-    
+
     var map = L.map('map').setView([0.7893, 113.9213], 5);
     let params = getParams();
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', noWrap: true}).addTo(map);
@@ -158,7 +158,7 @@ crossorigin=""></script>
         let allowAll = ['010103','010201','0102','010201','010301','010401','010501','010601','010701']
         let role = '{{@$user->role}}'
         let satkerid = '{{@$user->satkerid}}'
-        
+
         if(allowAll.includes(satkerid) || role=='admin' ){
             $('#satkerid').select2({
                 placeholder: '- Pilih Satker -',
@@ -175,10 +175,10 @@ crossorigin=""></script>
                             {satker:'010601',parent:'0106'},
                             {satker:'010701',parent:'0107'}
                         ]
-                        $.each(satkerData, function (idx, ss) { 
+                        $.each(satkerData, function (idx, ss) {
                             if(s == ss.satker){
                                 let newData = []
-                                $.each(data.data, function (i, v) { 
+                                $.each(data.data, function (i, v) {
                                     if(v.id == ss.parent || v.id.substring(0,4) == ss.parent){
                                         newData.push(v)
                                     }
@@ -230,7 +230,7 @@ crossorigin=""></script>
             url: "{{url('presensi-latlong')}}?"+params,
             dataType: "json",
             success: function (response) {
-                $.each(response.rows, function (indexInArray, v) { 
+                $.each(response.rows, function (indexInArray, v) {
                     if(v.lat_in != '-'){
                         var latlng = L.latLng(v.lat_in, v.long_in);
                         var marker = L.marker(latlng);
@@ -242,7 +242,7 @@ crossorigin=""></script>
         });
 
 		map.addLayer(markers);
-        
+
     }
     function serialize(obj) {
         var str = [];
@@ -311,8 +311,8 @@ crossorigin=""></script>
                 }
             });
         }
-        
-        
+
+
     }
     function loadPieChart(){
         let params = getParamsStatistic()
@@ -324,7 +324,7 @@ crossorigin=""></script>
                 success: function (response) {
                     let labels = [];
                     let d = [];
-                    $.each(response, function (idx, v) { 
+                    $.each(response, function (idx, v) {
                          labels.push(v.nama_sistem_kerja)
                          d.push(v.count)
                     });
@@ -364,7 +364,7 @@ crossorigin=""></script>
                                 }
                             }
                         },
-                        
+
                     };
                     if(myPieChart){
                         myPieChart.destroy()
@@ -376,8 +376,8 @@ crossorigin=""></script>
                 }
             });
         }
-        
-        
+
+
     }
 
     function loadStatistik(){
@@ -388,7 +388,7 @@ crossorigin=""></script>
             dataType: "json",
             success: function (response) {
                 let data = '';
-                $.each(response, function (i, v) { 
+                $.each(response, function (i, v) {
                     let icon = 'user-x';
                     let bg = 'warning';
                      if(v.nama_sistem_kerja == 'WFH' || v.nama_sistem_kerja == 'WFO' || v.nama_sistem_kerja == 'Upacara Bendera' || v.nama_sistem_kerja == 'Dinas Keluar'|| v.nama_sistem_kerja == 'Tugas Belajar'){

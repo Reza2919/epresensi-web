@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\API;
-use App\Helpers\SIAP;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PeriodeTukinController extends Controller
 {
@@ -12,157 +12,181 @@ class PeriodeTukinController extends Controller
         return view('periode.index');
     }
 
-    public function get(Request $request, $mode = ''){
-        $user = session('userdata');
-        if(empty($mode)) $mode = 'datatable';
-        $search = @$request->search;
-        $length = @$request->length;
-        $start = @$request->start;
+   public function get(Request $request, $mode = '')
+{
+    if(empty($mode)){
+        $mode = 'datatable';
+    }
 
+    $query = DB::table('periode_tukin');
 
-        if($mode == 'select2') $search = ['value' => !empty(@$request->q) ? @$request->q : @$request->search];
+    if(!empty($request->search['value'])){
 
-        $body = [
-            'offset' => $start,
-            'limit' => $length,
-            'search' => $search,
-        ];
+        $query->where(
+            'periode',
+            'ILIKE',
+            '%'.$request->search['value'].'%'
+        );
 
-        $res = API::get('periode', $body);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
+    }
 
-        $rows = !empty($sources) ? $sources->rows : [];
+    $rows = $query
+        ->orderBy('periode')
+        ->get();
 
-        if($mode == 'datatable'){
-            $data = [];
-            $no = 1 + $request->start;
-            foreach($rows as $row){
-                $d = [];
-                $d[] = $no;
-                $d[] = $row->periode;
-                $d[] = "<i class='badge badge-".($row->is_active == 1 ? 'success' : 'warning')."'>".($row->is_active == 1 ? 'Aktif' : 'Tidak Aktif')."</i> ";
-                $buttons = '<a href="'. route('periode.edit', [$row->id_periode]) .'" class="btn btn-icon btn-outline-info" title="Edit"><i data-feather="edit-3"></i> </a>';
-                $buttons .= '
-                    <a href="'. route('periode.destroy', [$row->id_periode]) .'" class="btn btn-icon btn-outline-danger btn-delete" title="Hapus"><i data-feather="delete"> </i> </a>';
-                if($row->is_active == 1){
-                    $buttons .= '
-                    <a href="'. route('periode.set-active', [$row->id_periode]) .'" class="btn btn-icon btn-outline-warning btn-active" title="Nonaktifkan"><i data-feather="x"></i> </a>';
-                }else{
-                    $buttons .= '
-                    <a href="'. route('periode.set-active', [$row->id_periode]) .'" class="btn btn-icon btn-outline-success btn-active" title="Aktifkan"><i data-feather="check"></i> </a>';
-                }
-                $d[] = $buttons;
-                $data[] = $d;
-                $no++;
-            }
+    if($mode == 'datatable'){
 
-            $result['data'] = $data;
-            $result['recordsTotal'] = $sources->count;
-            $result['recordsFiltered'] = $sources->count;
-        } else {
-            if($request->optionAll) $result['data'][] = ['id' => '0', 'text' => 'Semua Periode Tukin'];
-            foreach($rows as $row){
-                $result['data'][] = [
-                    'id' => $row->id_periode,
-                    'text' => $row->periode
-                ];
-            }
+        $data = [];
+        $no = 1;
+
+        foreach($rows as $row){
+
+            $status =
+                "<span class='badge badge-".
+                ($row->is_active ? 'success' : 'warning').
+                "'>".
+                ($row->is_active ? 'Aktif' : 'Tidak Aktif').
+                "</span>";
+
+            $buttons='
+                <a href="'.route('periode.edit',$row->id_periode).'"
+                    class="btn btn-info btn-sm">
+                    Edit
+                </a>
+
+                <a href="'.url('periode/'.$row->id_periode).'"
+                    class="btn btn-success btn-sm">
+                    Detail
+                </a>
+
+                <a href="'.url('periode/'.$row->id_periode).'"
+                    class="btn btn-danger btn-sm btn-delete">
+                    Hapus
+                </a>
+            ';
+
+            $data[]=[
+                $no++,
+                $row->periode,
+                $status,
+                $buttons
+            ];
+
         }
 
-        return response()->json($result);
+        return response()->json([
+            'draw'=>intval($request->draw??1),
+            'recordsTotal'=>count($data),
+            'recordsFiltered'=>count($data),
+            'data'=>$data
+        ]);
     }
+
+    $result=['data'=>[]];
+
+    foreach($rows as $row){
+
+        $result['data'][]=[
+            'id'=>$row->id_periode,
+            'text'=>$row->periode
+        ];
+
+    }
+
+    return response()->json($result);
+}
 
     public function create(){
         return view('periode.form');
     }
 
-    public function edit($id){
-        $res = API::get('periode/'.$id);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            return view('periode.form')->with([
-                'periode' => $data->data,
-            ]);
-        }
-        return redirect()->back()->with('error', $data->message);
-    }
+    public function edit($id)
+{
+    $periode = DB::table('periode_tukin')
+        ->where('id_periode',$id)
+        ->first();
 
-    public function store(Request $request){
-        $input = $request->all();
+    return view('periode.form')->with([
+        'periode'=>$periode
+    ]);
+}
 
-        $custom_msg = [
-            'periode.required' => 'Nama sistem kerja harus diisi!.',
-        ];
+public function show($id)
+{
+    $periode = DB::table('periode_tukin')
+        ->where('id_periode', $id)
+        ->first();
 
-        $validation = \Validator::make($input, [
-            "periode" => "required",
-        ], $custom_msg);
+    return view('periode.show', compact('periode'));
+}
 
-        if($validation->fails()) return redirect()->back()->withInput()->with('errors', $validation->errors());
+   public function store(Request $request)
+{
+    DB::table('periode_tukin')->insert([
 
-        $res = API::post('periode/create', $input);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            return redirect()->route('periode.index')->with('success', $data->message);
-        }
-        return redirect()->back()->with([
-            'error_api' => $data->message ?? '',
-            'errors_api' => $data->errors ?? []
+        'id_periode' => Str::uuid()->toString(),
+
+        'periode' => $request->periode,
+
+        'is_active' => 0,
+
+        'createdAt' => now(),
+        'updatedAt' => now()
+
+    ]);
+
+    return redirect()
+        ->route('periode.index')
+        ->with('success','Periode Tukin berhasil ditambahkan');
+}
+
+   public function update(Request $request,$id)
+{
+    DB::table('periode_tukin')
+        ->where('id_periode',$id)
+        ->update([
+
+            'periode' => $request->periode,
+
+            'updatedAt' => now()
+
         ]);
-    }
 
-    public function update(Request $request,$id){
-        $input = $request->all();
+    return redirect()
+        ->route('periode.index')
+        ->with('success','Periode Tukin berhasil diperbarui');
+}
 
-        $custom_msg = [
-            'periode.required' => 'Nama sistem kerja harus diisi!.',
-        ];
+    public function destroy($id)
+{
+    DB::table('periode_tukin')
+        ->where('id_periode',$id)
+        ->delete();
 
-        $validation = \Validator::make($input, [
-            "periode" => "required",
-        ], $custom_msg);
+    return response()->json([
+        'error'=>false,
+        'message'=>'Data berhasil dihapus'
+    ]);
+}
 
-        if($validation->fails()) return redirect()->back()->withInput()->with('errors', $validation->errors());
-
-        $res = API::post('periode/'.$id, $input);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            return redirect()->route('periode.index')->with('success', $data->message);
-        }
-        return redirect()->back()->with([
-            'error_api' => $data->message ?? '',
-            'errors_api' => $data->errors ?? []
+   public function setActive($id)
+{
+    DB::table('periode_tukin')
+        ->update([
+            'is_active'=>0,
+            'updatedAt'=>now()
         ]);
-    }
 
-    public function destroy($id){
-        $res = API::delete('periode/'.$id);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        return response()->json([
-            'code' => $data->code,
-            'message' => $data->message,
-            'error' => $data->code == 200 ? false : true,
-            'error_api' => $data->code == 200 ? null : $data->message,
-            'errors_api' => $data->code == 200 ? [] : $data->errors
+    DB::table('periode_tukin')
+        ->where('id_periode',$id)
+        ->update([
+            'is_active'=>1,
+            'updatedAt'=>now()
         ]);
-    }
 
-    public function setActive($id){
-        $res = API::post('periode/'.$id.'/set-active',[]);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        return response()->json([
-            'code' => $data->code,
-            'message' => $data->message,
-            'error' => $data->code == 200 ? false : true,
-            'error_api' => $data->code == 200 ? null : $data->message,
-            'errors_api' => $data->code == 200 ? [] : $data->errors
-        ]);
-    }
+    return response()->json([
+        'error'=>false,
+        'message'=>'Periode aktif berhasil diubah'
+    ]);
+}
 }

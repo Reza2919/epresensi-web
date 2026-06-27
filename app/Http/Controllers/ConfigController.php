@@ -25,12 +25,30 @@ class ConfigController extends Controller
             'search' => $search,
         ];
 
-        $res = API::get('config', $body);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
+       $rows = [
+    (object)[
+        'id_config' => 1,
+        'name' => 'jam_masuk',
+        'value' => '08:00',
+        'desc' => 'Jam masuk kerja'
+    ],
+    (object)[
+        'id_config' => 2,
+        'name' => 'jam_pulang',
+        'value' => '17:00',
+        'desc' => 'Jam pulang kerja'
+    ],
+    (object)[
+        'id_config' => 3,
+        'name' => 'toleransi_telat',
+        'value' => '15',
+        'desc' => 'Toleransi keterlambatan'
+    ]
+];
 
-        $rows = !empty($sources) ? $sources->rows : [];
+$result['draw'] = intval($request->draw);
+$result['recordsTotal'] = count($rows);
+$result['recordsFiltered'] = count($rows);
 
         if($mode == 'datatable'){
             $data = [];
@@ -54,8 +72,8 @@ class ConfigController extends Controller
             }
 
             $result['data'] = $data;
-            $result['recordsTotal'] = $sources->count-$info_count;
-            $result['recordsFiltered'] = $sources->count-$info_count;
+           $result['recordsTotal'] = count($data);
+           $result['recordsFiltered'] = count($data);
         } else {
             if($request->optionAll) $result['data'][] = ['id' => '0', 'text' => 'Semua Sistem Kerja'];
             foreach($rows as $row){
@@ -69,17 +87,19 @@ class ConfigController extends Controller
         return response()->json($result);
     }
 
-    public function edit($id){
-        $res = API::get('config/'.$id);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            return view('config.form')->with([
-                'config' => $data->data
-            ]);
-        }
-        return redirect()->back()->with('error', $data->message);
-    }
+    public function edit($id)
+{
+    $dummy = (object)[
+        'id_config' => $id,
+        'name' => 'jam_masuk',
+        'value' => '08:00',
+        'desc' => 'Jam masuk kerja'
+    ];
+
+    return view('config.form')->with([
+        'config' => $dummy
+    ]);
+}
 
     public function update(Request $request,$id){
         $input = $request->all();
@@ -94,61 +114,52 @@ class ConfigController extends Controller
 
         if($validation->fails()) return redirect()->back()->withInput()->with('errors', $validation->errors());
 
-        $res = API::post('config/'.$id, $input);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            if(@$request->is_redirect == "false"){
-                return response()->json($data);
-            }
-            return redirect()->route('config.index')->with('success', $data->message);
-        }
-        if(@$request->is_redirect == 'false'){
-            return response()->json([
-                'error_api' => $data->message ?? '',
-                'errors_api' => $data->errors ?? []
-            ]);
-        }
-        return redirect()->back()->with([
-            'error_api' => $data->message ?? '',
-            'errors_api' => $data->errors ?? []
-        ]);
+        if(@$request->is_redirect == "false"){
+    return response()->json([
+        'code' => 200,
+        'message' => 'Config berhasil diupdate'
+    ]);
+}
+
+return redirect()
+    ->route('config.index')
+    ->with('success', 'Config berhasil diupdate');
     }
 
-    public function show($name){
-        $res = API::get('config/search/'.$name);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            return view('config.form-info')->with([
-                'config' => $data->data
-            ]);
-        }
-        return redirect()->back()->with('error', $data->message);
-    }
+    public function show($name)
+{
+    return view('config.form-info')->with([
+        'config' => (object)[
+            'id_config' => 1,
+            'name' => $name,
+            'value' => 'Dummy Content',
+            'desc' => 'Demo Mode'
+        ]
+    ]);
+}
 
-    public function kebijakanPrivasi(){
-        $res = API::get('config/search/kebijakan-privasi');
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            return view('config.kebijakan-privasi')->with([
-                'config' => $data->data
-            ]);
-        }
-        return redirect()->back()->with('error', $data->message);
-    }
+public function kebijakanPrivasi()
+{
+    return view('config.form-info')->with([
+        'config' => (object)[
+            'id_config' => 99,
+            'name' => 'kebijakan-privasi',
+            'value' => 'Ini adalah kebijakan privasi aplikasi e-Presensi versi demo.',
+            'desc' => 'Demo Mode'
+        ]
+    ]);
+}
 
-    public function destroy($id){
-        $res = API::delete('config/'.$id);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        return response()->json([
-            'code' => $data->code,
-            'message' => $data->message,
-            'error' => $data->code == 200 ? false : true,
-            'error_api' => $data->code == 200 ? null : $data->message,
-            'errors_api' => $data->code == 200 ? [] : $data->errors
-        ]);
-    }
+
+        
+    
+
+    public function destroy($id)
+{
+    return response()->json([
+        'code' => 200,
+        'message' => 'Config berhasil dihapus',
+        'error' => false
+    ]);
+}
 }

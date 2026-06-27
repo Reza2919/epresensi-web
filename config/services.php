@@ -30,4 +30,6 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'api_url' => env('API_URL', 'http://localhost:2400/'),
+
 ];

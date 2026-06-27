@@ -35,6 +35,6 @@
 <!-- END: Page CSS-->
 
 <!-- BEGIN: Custom CSS-->
-<link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/assets/css/style.css">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets') }}/assets/css/style.css?v={{ filemtime(public_path('assets/assets/css/style.css')) }}">
 <!-- END: Custom CSS-->
 @stack('css')

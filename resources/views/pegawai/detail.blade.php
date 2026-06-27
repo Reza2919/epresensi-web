@@ -45,7 +45,7 @@
                     </div>
                   </div>
                   <h3>{{ $pegawai->nama }}</h3>
-                  <h6 class="text-muted">{{ @$pegawai->namajabatan }}</h6>
+                  <h6 class="text-muted">{{ $pegawai->jabatan }}</h6>
                   <hr class="mb-2">
                   <div class="text-left">
                     <div class="mt-2">
@@ -90,7 +90,7 @@
                     <div class="card">
                         <div class="card-header bg-primary">
                             <h4 class="class-title text-white">Data Presensi</h4>
-                            <form action="{{ url('rekap-presensi/'.$id_pegawai) }}" method="post" target="_blank">
+                            <form action="{{ url('rekap-presensi/'.$pegawai->id) }}" method="post" target="_blank">
                                 <div class="row">
                                     <div class="col-md-5 col-xs-12">
                                         <div class="form-group">
@@ -195,7 +195,7 @@
             <div class="card">
                 <div class="card-header bg-primary">
                     <h4 class="class-title text-white">Data Potongan Tunjangan Kinerja</h4>
-                    <form action="{{ url('rekap-tukin/'.$id_pegawai) }}" method="post" target="_blank">
+                    <form action="{{ url('rekap-presensi/'.$pegawai->id) }}" method="post" target="_blank">
                         <div class="row">
                             <div class="col-md-6 col-xs-12">
                                 <div class="form-group">
@@ -316,200 +316,102 @@
 <script src="{{ asset('assets') }}/app-assets/vendors/js/tables/datatable/dataTables.rowGroup.min.js"></script>
 <script src="{{ asset('assets') }}/app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js"></script>
 <script>
-    $(document).ready(function () {
-        let table = $('.presensi-list-table').DataTable({
-            searching: false,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{{ url("api/get-presensi-pegawai/datatable/".$id_pegawai) }}',
-                type: 'GET',
-                data: function(d){
-                    d.bulan= $('#p_bulan').val()
-                    d.tahun= $('#p_tahun').val()
-                },
-            },
-            drawCallback: function( settings ) {
-                feather.replace()
-            }
-        })
-        let tableTukin = $('.potongan-list-table').DataTable({
-            searching: false,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{{ url("api/get-potongan-tukin/datatable/".$id_pegawai) }}',
-                type: 'get',
-                data: function(d){
-                    d.bulan= $('#bulan').val()
-                    d.tahun= $('#tahun').val()
-                },
-            },
-            drawCallback: function( settings ) {
-                feather.replace()
-            }
-        })
-        $('#p_bulan,#p_tahun').on('change', function() {
-            table.ajax.reload()
-        })
-        $('#bulan,#tahun').on('change', function() {
-            tableTukin.ajax.reload()
-            getSummary()
-        })
-        $('#btn-add-potongan').on('click',function(){
-            $('#id_potongan_tukin').val('')
-            $('#tanggal').val('')
-            $('#keterangan').val('')
-            $('#jumlah_potongan').val('')
-            $('#potongan-modal').modal('show')
-        })
-        $(document).on('click','.btn-edit',function(){
-            let jml = $(this).data('jumlah_potongan').toFixed(2)
-            let keterangan = $(this).data('keterangan')
-            let tanggal = $(this).data('tanggal')
-            let id = $(this).data('id')
-            $('#id_potongan_tukin').val(id)
-            $('#keterangan').val(keterangan)
-            $('#tanggal').val(tanggal)
-            $('#jumlah_potongan').val(jml)
-            $('#potongan-modal').modal('show')
-        })
-        $('#btn-save-potongan').on('click',function(){
+   $(document).ready(function () {
 
-            $('#potongan-modal').modal('hide')
-            let id_potongan_tukin = $('#id_potongan_tukin').val();
-            let keterangan = $('#keterangan').val();
-            let jumlah_potongan = $('#jumlah_potongan').val();
-            let tanggal = $('#tanggal').val();
-            let id_pegawai = '{{ $id_pegawai }}';
-            $.ajax({
-                type: "post",
-                url: '{{ url("potongan-tukin") }}',
-                data: {
-                    id_potongan_tukin : id_potongan_tukin,
-                    id_pegawai : id_pegawai,
-                    tanggal : tanggal,
-                    jumlah_potongan : jumlah_potongan,
-                    keterangan : keterangan,
-                    _token : '{{ csrf_token() }}',
-                },
-                dataType: "json",
-                success: function (response) {
-                    if(response.success == true){
-                        toastr['success'](
-                            response.message,
-                            'Success',
-                            {
-                                closeButton: true,
-                                tapToDismiss: false,
-                            }
-                        );
-                        $('#id_potongan_tukin').val('')
-                        $('#keterangan').val('')
-                        $('#jumlah_potongan').val('')
-                        $('#tanggal').val('')
-
-                        getSummary()
-                        tableTukin.ajax.reload()
-                        table.ajax.reload()
-                    }else{
-                        toastr['error'](
-                            response.message,
-                            'Error',
-                            {
-                                closeButton: true,
-                                tapToDismiss: false,
-                            }
-                        );
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', '.btn-delete', function(e){
-            e.preventDefault()
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Anda tidak dapat mengembalikan data yang akan dihapus!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, saya yakin!',
-                cancelButtonText: 'Batalkan!'
-            }).then((result) => {
-            if (result.value) {
-                url = $(this).attr('href')
-                $.ajax({
-                    url: url,
-                    method: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    }
-                }).then(function(res){
-                    if(res.error){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan pada server!'
-                        })
-                    } else {
-                        Swal.fire(
-                            'Deleted!',
-                            'Data berhasil dihapus.',
-                            'success'
-                        )
-                        getSummary()
-                        tableTukin.ajax.reload()
-                        table.ajax.reload()
-                    }
-                })
-            }
-            })
-        })
-        $(document).on('click', '.btn-delete-presensi', function(e){
-            e.preventDefault()
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Anda tidak dapat mengembalikan data yang akan dihapus!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, saya yakin!',
-                cancelButtonText: 'Batalkan!'
-            }).then((result) => {
-            if (result.value) {
-                url = $(this).attr('href')
-                $.ajax({
-                    url: url,
-                    method: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    }
-                }).then(function(res){
-                    if(res.error){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan pada server!'
-                        })
-                    } else {
-                        Swal.fire(
-                            'Deleted!',
-                            'Data berhasil dihapus.',
-                            'success'
-                        )
-                        getSummary()
-                        tableTukin.ajax.reload()
-                        table.ajax.reload()
-                    }
-                })
-            }
-            })
-        })
-        getSummary()
+    $('#btn-add-potongan').on('click', function () {
+        $('#id_potongan_tukin').val('');
+        $('#tanggal').val('');
+        $('#keterangan').val('');
+        $('#jumlah_potongan').val('');
+        $('#potongan-modal').modal('show');
     });
+
+    $(document).on('click','.btn-edit',function(){
+        let jml = $(this).data('jumlah_potongan').toFixed(2);
+        let keterangan = $(this).data('keterangan');
+        let tanggal = $(this).data('tanggal');
+        let id = $(this).data('id');
+
+        $('#id_potongan_tukin').val(id);
+        $('#keterangan').val(keterangan);
+        $('#tanggal').val(tanggal);
+        $('#jumlah_potongan').val(jml);
+
+        $('#potongan-modal').modal('show');
+    });
+
+    $('#btn-save-potongan').on('click', function () {
+
+        $('#potongan-modal').modal('hide');
+
+        let id_potongan_tukin = $('#id_potongan_tukin').val();
+        let keterangan = $('#keterangan').val();
+        let jumlah_potongan = $('#jumlah_potongan').val();
+        let tanggal = $('#tanggal').val();
+        let id_pegawai = '{{ $id_pegawai }}';
+
+        $.ajax({
+            type: "post",
+            url: '{{ url("potongan-tukin") }}',
+            data: {
+                id_potongan_tukin : id_potongan_tukin,
+                id_pegawai : id_pegawai,
+                tanggal : tanggal,
+                jumlah_potongan : jumlah_potongan,
+                keterangan : keterangan,
+                _token : '{{ csrf_token() }}',
+            },
+            dataType: "json",
+            success: function (response) {
+
+                if(response.success){
+
+                    toastr.success(response.message);
+
+                    $('#id_potongan_tukin').val('');
+                    $('#keterangan').val('');
+                    $('#jumlah_potongan').val('');
+                    $('#tanggal').val('');
+
+                }else{
+
+                    toastr.error(response.message);
+
+                }
+            }
+        });
+    });
+
+    getSummary();
+
+$('.presensi-list-table').DataTable({
+    processing: true,
+    serverSide: false,
+    ajax: '{{ url("api/get-presensi-pegawai/datatable/".$id_pegawai) }}',
+    columns: [
+        { data: 0 },
+        { data: 1 },
+        { data: 2 },
+        { data: 3 },
+        { data: 4 },
+        { data: 5 }
+    ]
+});
+
+$('.potongan-list-table').DataTable({
+    processing: true,
+    serverSide: false,
+    ajax: '{{ url("api/get-potongan-tukin/datatable/".$id_pegawai) }}',
+    columns: [
+        { data: 0 },
+        { data: 1 },
+        { data: 2 },
+        { data: 3 },
+        { data: 4 }
+    ]
+});
+
+});
     function getSummary(){
         $.ajax({
             type: "post",

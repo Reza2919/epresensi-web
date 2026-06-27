@@ -26,7 +26,7 @@
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
             <div class="content-header row">
-                <div class="content-header-left col-md-9 col-12 mb-2">
+                <div class="content-header-left col-md-9 col-12">
                     @yield('breadcrumb')
                 </div>
             </div>

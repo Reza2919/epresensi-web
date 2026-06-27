@@ -76,18 +76,8 @@
 <script src="{{ asset('assets') }}/app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js"></script>
 <script>
     $(document).ready(function () {
-        let table = $('.table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{{ url("api/get-cuti/datatable") }}',
-                type: 'GET',
-            },
-            drawCallback: function( settings ) {
-                feather.replace()
-            }
-        }) 
-    });
+
+});
 </script>
 @include('layouts.alerts')
 @endpush
