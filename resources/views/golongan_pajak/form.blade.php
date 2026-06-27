@@ -31,12 +31,17 @@
                             <div class="col-12">
                                 <div class="form-group">
                                   <label for="">Golongan</label>
-                                  <select class="form-control" name="golongan" id="golongan">
-                                      <option>Pilih Golongan</option>
-                                      @foreach ($golongan as $item)
-                                        <option value="{{ $item->golongan }}" {{ @$golongan_pajak->golongan == $item->golongan ? 'selected' : '' }}>{{ $item->golongan }}</option> 
-                                      @endforeach
-                                  </select>
+                                 <select class="form-control" name="golongan" id="golongan" required>
+    <option value="">Pilih Golongan</option>
+
+    @for($i=1;$i<=20;$i++)
+        <option
+            value="Golongan {{ $i }}"
+            {{ @$golongan_pajak->golongan=="Golongan ".$i ? 'selected' : '' }}>
+            Golongan {{ $i }}
+        </option>
+    @endfor
+</select>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -75,20 +80,10 @@
 <script src="{{ asset('assets') }}/app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js"></script>
 <script src="{{ asset('assets') }}/app-assets/vendors/js/autoNumeric/autoNumeric.min.js"></script>
 <script>
-    $(document).ready(function () {
-        new AutoNumeric('#jumlah_tukin', { currencySymbol : 'Rp',digitGroupSeparator: '.',decimalCharacter: ',',vMin: 0 });
-        let table = $('.table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{{ url("api/get-tukin/datatable") }}',
-                type: 'GET',
-            },
-            drawCallback: function( settings ) {
-                feather.replace()
-            }
-        }) 
-    });
+   <script>
+$(function(){
+
+});
 </script>
 @include('layouts.alerts')
 @endpush

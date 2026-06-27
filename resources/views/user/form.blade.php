@@ -43,16 +43,34 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="password">Password</label>
-                                    <input type="password" id="password" class="form-control" name="password" placeholder="Password" required>
+                                    <input type="password" id="password" class="form-control" name="password" placeholder="Password">
                                 </div>
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="password_confirmation">Konfirmasi Password</label>
-                                    <input type="password" id="password_confirmation" class="form-control" name="password_confirmation" placeholder="Konfirmasi Password" required>
-                                </div>
+                                    <input type="password" id="password_confirmation" class="form-control" name="password_confirmation" placeholder="Konfirmasi Password">
                             </div>
                             <div class="col-12">
+                                <div class="col-12">
+    <div class="form-group">
+        <label>Level</label>
+
+        <select name="level" class="form-control" required>
+
+            <option value="1"
+                {{ (@$u && $u->level == 1) ? 'selected' : '' }}>
+                Admin
+            </option>
+
+            <option value="2"
+                {{ (@$u && $u->level == 2) ? 'selected' : '' }}>
+                Operator
+            </option>
+
+        </select>
+    </div>
+</div>
                                 <button type="submit" class="btn btn-primary mr-1 waves-effect waves-float waves-light">Simpan</button>
                                 <button type="reset" class="btn btn-outline-secondary waves-effect">Reset</button>
                             </div>

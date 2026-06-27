@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class JobGeneratePresensi extends Model
 {
     use HasFactory;
-    protected $table = 'job_generate_presensi';
+
+    protected $table = 'job_generate_laporan_presensi';
+
     protected $guarded = [];
 }

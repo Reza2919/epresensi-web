@@ -123,9 +123,19 @@ class RekapPresensiController extends Controller
         $res = API::get('presensi/' . $id . '?' . http_build_query($body));
         $body = $res->getBody()->getContents();
         $content = json_decode($body);
-        $sources = $content->data;
+        $content = json_decode($body);
 
-        $rows = !empty($sources) ? $sources->rows : [];
+$rows = [];
+
+if (!isset($content->data)
+    || !isset($content->data->rows)
+    || empty($content->data->rows)) {
+
+    $rows = [];
+
+} else {
+    $rows = $content->data->rows;
+}
         $menitKerja = 0;
         foreach ($rows as $key => $p) {
             $menitKerja += $p->menit_kerja;
@@ -299,12 +309,8 @@ class RekapPresensiController extends Controller
     }
     public function getPresensiLatLong()
     {
-        $tanggal = request()->tanggal;
-        $idsatker = request()->idsatker;
-        $res = API::get('presensi-latlong?tanggal='.$tanggal.'&id_satker='.$idsatker);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $data = @$content->data;
-        return response()->json($data);
-    }
+    return response()->json([
+    'rows' => []
+]);
+}
 }

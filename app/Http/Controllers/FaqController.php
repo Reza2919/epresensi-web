@@ -8,26 +8,38 @@ use Illuminate\Http\Request;
 class FaqController extends Controller
 {
     public function index() {
+
         $res = API::get('faq');
         $body = $res->getBody()->getContents();
         $content = json_decode($body);
-        $sources = $content->data;
 
-
-        $arr = array();
-
-        foreach ($sources->rows as $key => $item) {
-            $arr[$item->faq_kategori->kategori][$key] = $item;
+        if (!$content || !isset($content->data)) {
+            return view('faq.index', [
+                'list' => [],
+                'manual' => []
+            ]);
         }
 
-        ksort($arr, SORT_NUMERIC);
+        $sources = $content->data ?? null;
 
+        $arr = [];
+
+        foreach ($sources->rows ?? [] as $item) {
+
+            $kategori = optional($item->faq_kategori)->kategori ?? 'Uncategorized';
+
+            $arr[$kategori][] = $item;
+        }
+
+        ksort($arr);
+
+        // manual book
         $res = API::get('manual-book', []);
         $body = $res->getBody()->getContents();
         $content = json_decode($body);
-        $sources = $content->data;
 
-        $rows = !empty($sources) ? $sources->rows : [];
+        $sources = $content->data ?? null;
+        $rows = $sources->rows ?? [];
 
         return view('faq.index', [
             'list' => $arr,
@@ -48,104 +60,97 @@ class FaqController extends Controller
     }
 
     public function getListFaq(Request $request, $mode = '') {
+
         if(empty($mode)) $mode = 'datatable';
-        $search = @$request->search;
-        $length = @$request->length;
-        $start = @$request->start;
 
-        if($mode == 'select2') $search = ['value' => !empty(@$request->q) ? @$request->q : @$request->search];
+        $search = $request->search;
+        $length = $request->length;
+        $start  = $request->start;
 
-        $body = [
-            'offset' => $start,
-            'limit' => $length,
-            'search' => $search,
-        ];
-
-        $res = API::get('faq', $body);
+        $res = API::get('faq');
         $body = $res->getBody()->getContents();
         $content = json_decode($body);
-        $sources = $content->data;
 
-        $rows = !empty($sources) ? $sources->rows : [];
+        if (!$content || !isset($content->data)) {
+            return response()->json([
+                'draw' => intval($request->draw ?? 0),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => []
+            ]);
+        }
+
+        $sources = $content->data ?? null;
+        $rows = $sources->rows ?? [];
+        $count = $sources->count ?? 0;
 
         if($mode == 'datatable'){
+
             $data = [];
-            $no = 1 + $request->start;
+            $no = 1 + $start;
 
             foreach($rows as $row){
-                $d = [];
-                $d[] = $no;
-                $d[] = $row->faq_kategori->kategori;
-                $d[] = $row->question;
-                $d[] = strip_tags($row->answer);
-                $buttons = '<a href="'. route('faq.edit', [$row->id_faq]) .'" class="btn btn-icon btn-outline-info" title="Edit"><i data-feather="edit-3"></i> </a>';
-                $buttons .= '
-                    <a href="'. route('faq.destroy', [$row->id_faq]) .'" class="btn btn-icon btn-outline-danger btn-delete" title="Hapus"><i data-feather="delete"> </i> </a>';
 
-                $d[] = $buttons;
-                $data[] = $d;
-                $no++;
-            }
-
-            $result['data'] = $data;
-            $result['recordsTotal'] = $sources->count;
-            $result['recordsFiltered'] = $sources->count;
-        } else {
-            if($request->optionAll) $result['data'][] = ['id' => '0', 'text' => 'Semua'];
-            foreach($rows as $row){
-                $result['data'][] = [
-                    'id' => $row->id_kategori,
-                    'text' => $row->kategori
+                $data[] = [
+                    $no++,
+                    optional($row->faq_kategori)->kategori ?? 'Uncategorized',
+                    $row->question ?? '-',
+                    strip_tags($row->answer ?? '-'),
+                    '<a href="'.route('faq.edit', $row->id_faq).'" class="btn btn-sm btn-info">Edit</a>
+                     <a href="'.route('faq.destroy', $row->id_faq).'" class="btn btn-sm btn-danger btn-delete">Hapus</a>'
                 ];
             }
+
+            return response()->json([
+                'draw' => intval($request->draw),
+                'recordsTotal' => $count,
+                'recordsFiltered' => $count,
+                'data' => $data
+            ]);
         }
-        return response()->json($result);
+
+        return response()->json([
+            'data' => []
+        ]);
     }
 
     public function submitFaq(Request $request) {
-//        dd($request->all());
-        $res = API::post('faq/create', [
+
+        API::post('faq/create', [
             'id_kategori' => $request->kategori,
             'question' => $request->pertanyaan,
             'answer' => $request->jawaban,
         ]);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
 
-        return redirect()->to('setting/faq')->with('success', "Berhasil");
+        return redirect('setting/faq')->with('success', "Berhasil");
     }
 
     public function updateFaq(Request $request, $id) {
 
-        $res = API::post('faq/'.$id, [
+        API::post('faq/'.$id, [
             'id_kategori' => $request->kategori,
             'question' => $request->pertanyaan,
             'answer' => $request->jawaban,
         ]);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
 
-        return redirect()->to('setting/faq')->with('success', "Berhasil");
+        return redirect('setting/faq')->with('success', "Berhasil");
     }
 
-    public function destroyFaq(Request $request, $id) {
-        $res = API::delete('faq/'.$id);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
+    public function destroyFaq($id) {
 
-        return redirect()->to('setting/faq')->with('success', "Berhasil");
+        API::delete('faq/'.$id);
+
+        return redirect('setting/faq')->with('success', "Berhasil");
     }
 
     public function editFaq($id) {
+
         $res = API::get('faq/'.$id.'/byid');
         $body = $res->getBody()->getContents();
         $content = json_decode($body);
-        $sources = $content->data;
 
         return view('faq.form', [
-            'value' => $sources
+            'value' => $content->data ?? null
         ]);
     }
 
@@ -154,96 +159,67 @@ class FaqController extends Controller
     }
 
     public function editKategori($id) {
+
         $res = API::get('faq-kategori/'.$id);
         $body = $res->getBody()->getContents();
         $content = json_decode($body);
-        $sources = $content->data;
+
         return view('faq.form-kategori', [
-            'value' => $sources
+            'value' => $content->data ?? null
         ]);
     }
 
     public function submitKategori(Request $request) {
-        $res = API::post('faq-kategori/create', [
+
+        API::post('faq-kategori/create', [
             'kategori' => $request->kategori
         ]);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
 
-        return redirect()->to('setting/kategori')->with('success', "Berhasil");
+        return redirect('setting/kategori')->with('success', "Berhasil");
     }
 
     public function updateKategori(Request $request, $id) {
-        $res = API::post('faq-kategori/'.$id, [
+
+        API::post('faq-kategori/'.$id, [
             'kategori' => $request->kategori
         ]);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
 
-        return redirect()->to('setting/kategori')->with('success', "Berhasil");
+        return redirect('setting/kategori')->with('success', "Berhasil");
     }
 
     public function getKategori(Request $request, $mode = '') {
-        if(empty($mode)) $mode = 'datatable';
-        $search = @$request->search;
-        $length = @$request->length;
-        $start = @$request->start;
 
-        if($mode == 'select2') $search = ['value' => !empty(@$request->q) ? @$request->q : @$request->search];
-
-        $body = [
-            'offset' => $start,
-            'limit' => $length,
-            'search' => $search,
-        ];
-
-        $res = API::get('faq-kategori', $body);
+        $res = API::get('faq-kategori');
         $body = $res->getBody()->getContents();
         $content = json_decode($body);
-        $sources = $content->data;
 
-        $rows = !empty($sources) ? $sources->rows : [];
-
-        if($mode == 'datatable'){
-            $data = [];
-            $no = 1 + $request->start;
-
-            foreach($rows as $row){
-                $d = [];
-                $d[] = $no;
-                $d[] = $row->kategori;
-                $buttons = '<a href="'. route('kategori.edit', [$row->id_kategori]) .'" class="btn btn-icon btn-outline-info" title="Edit"><i data-feather="edit-3"></i> </a>';
-                $buttons .= '
-                    <a href="'. route('kategori.destroy', [$row->id_kategori]) .'" class="btn btn-icon btn-outline-danger btn-delete" title="Hapus"><i data-feather="delete"> </i> </a>';
-
-                $d[] = $buttons;
-                $data[] = $d;
-                $no++;
-            }
-
-            $result['data'] = $data;
-            $result['recordsTotal'] = $sources->count;
-            $result['recordsFiltered'] = $sources->count;
-        } else {
-            if($request->optionAll) $result['data'][] = ['id' => '0', 'text' => 'Semua'];
-            foreach($rows as $row){
-                $result['data'][] = [
-                    'id' => $row->id_kategori,
-                    'text' => $row->kategori
-                ];
-            }
+        if (!$content || !isset($content->data)) {
+            return response()->json([
+                'data' => []
+            ]);
         }
-        return response()->json($result);
+
+        $sources = $content->data ?? null;
+        $rows = $sources->rows ?? [];
+
+        $data = [];
+
+        foreach($rows as $row){
+            $data[] = [
+                'id' => $row->id_kategori ?? 0,
+                'text' => $row->kategori ?? ''
+            ];
+        }
+
+        return response()->json([
+            'data' => $data
+        ]);
     }
 
-    public function destroyKategori(Request $request, $id) {
-        $res = API::delete('faq-kategori/'.$id);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
+    public function destroyKategori($id) {
 
-        return redirect()->to('setting/kategori')->with('success', "Berhasil");
+        API::delete('faq-kategori/'.$id);
+
+        return redirect('setting/kategori')->with('success', "Berhasil");
     }
 }

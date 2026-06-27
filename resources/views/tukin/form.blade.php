@@ -30,6 +30,24 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
+                                    <div class="col-12">
+    <div class="form-group">
+        <label>Periode</label>
+
+        <select class="form-control" name="id_periode" required>
+
+            @foreach($periodes as $periode)
+
+                <option value="{{ $periode->id_periode }}"
+                    {{ @$tukin->id_periode == $periode->id_periode ? 'selected' : '' }}>
+                    {{ $periode->periode }}
+                </option>
+
+            @endforeach
+
+        </select>
+    </div>
+</div>
                                   <label for="">Grade</label>
                                   <select class="form-control" name="kelas_jabatan" id="kelas_jabatan">
                                     @for ($i = 1; $i <= 17; $i++)

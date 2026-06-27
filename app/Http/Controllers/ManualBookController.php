@@ -34,25 +34,17 @@ class ManualBookController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'url' => 'required',
-            'description' => 'required',
-        ]);
+{
+    $request->validate([
+        'name' => 'required',
+        'url' => 'required',
+        'description' => 'required',
+    ]);
 
-        $res = API::post('manual-book/create', [
-            'name' => $request->name,
-            'url' => $request->url,
-            'description' => $request->description,
-        ]);
-
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
-
-        return redirect()->to('manual-book')->with('success', "Berhasil");
-    }
+    return redirect()
+        ->to('manual-book')
+        ->with('success', 'Manual Book berhasil ditambahkan');
+}
 
     /**
      * Display the specified resource.
@@ -72,18 +64,16 @@ class ManualBookController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        $res = API::get('manual-book/'.$id.'/byid');
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
+{
+    $data['value'] = (object)[
+        'id' => $id,
+        'name' => 'Panduan Login',
+        'url' => 'https://kemnaker.go.id/manual-login',
+        'description' => 'Panduan penggunaan login aplikasi'
+    ];
 
-        $data['value'] = $sources;
-
-
-
-        return view('manual-book.form', $data);
-    }
+    return view('manual-book.form', $data);
+}
 
     /**
      * Update the specified resource in storage.
@@ -93,25 +83,17 @@ class ManualBookController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required',
-            'url' => 'required',
-            'description' => 'required',
-        ]);
+{
+    $request->validate([
+        'name' => 'required',
+        'url' => 'required',
+        'description' => 'required',
+    ]);
 
-        $res = API::post('manual-book/'.$id, [
-            'name' => $request->name,
-            'url' => $request->url,
-            'description' => $request->description,
-        ]);
-
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
-
-        return redirect()->to('manual-book')->with('success', "Berhasil");
-    }
+    return redirect()
+        ->to('manual-book')
+        ->with('success', 'Manual Book berhasil diupdate');
+}
 
     /**
      * Remove the specified resource from storage.
@@ -138,12 +120,26 @@ class ManualBookController extends Controller
             'search' => $search,
         ];
 
-        $res = API::get('manual-book', $body);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-        $sources = $content->data;
-
-        $rows = !empty($sources) ? $sources->rows : [];
+       $rows = [
+    (object)[
+        'id' => 1,
+        'name' => 'Panduan Login',
+        'url' => 'https://kemnaker.go.id/manual-login',
+        'description' => 'Panduan penggunaan login aplikasi'
+    ],
+    (object)[
+        'id' => 2,
+        'name' => 'Panduan Presensi',
+        'url' => 'https://kemnaker.go.id/manual-presensi',
+        'description' => 'Panduan melakukan presensi'
+    ],
+    (object)[
+        'id' => 3,
+        'name' => 'Panduan Cuti',
+        'url' => 'https://kemnaker.go.id/manual-cuti',
+        'description' => 'Panduan pengajuan cuti'
+    ]
+];
 
         if($mode == 'datatable'){
             $data = [];
@@ -164,8 +160,8 @@ class ManualBookController extends Controller
             }
 
             $result['data'] = $data;
-            $result['recordsTotal'] = $sources->count;
-            $result['recordsFiltered'] = $sources->count;
+            $result['recordsTotal'] = count($rows);
+$result['recordsFiltered'] = count($rows);
         } else {
             if($request->optionAll) $result['data'][] = ['id' => '0', 'text' => 'Semua'];
             foreach($rows as $row){
@@ -175,14 +171,12 @@ class ManualBookController extends Controller
                 ];
             }
         }
+        $result['draw'] = intval($request->draw);
         return response()->json($result);
     }
 
-    public function destroyManualBook(Request $request, $id) {
-        $res = API::delete('manual-book/'.$id);
-        $body = $res->getBody()->getContents();
-        $content = json_decode($body);
-
-        return redirect()->to('manual-book')->with('success', "Berhasil");
-    }
+    public function destroyManualBook(Request $request, $id)
+{
+    return redirect()->to('manual-book')->with('success', 'Berhasil');
+}
 }

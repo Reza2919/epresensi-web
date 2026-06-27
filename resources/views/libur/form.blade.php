@@ -30,14 +30,14 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label for="nama_libur">Nama Bidang</label>
+                                   <label for="nama_libur">Nama Libur</label>
                                     <input type="text" id="nama_libur" class="form-control" name="nama_libur" placeholder="Nama Libur" value="{{ @$libur->nama_libur }}" required>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="tanggal">Tanggal</label>
-                                    <input type="date" id="tanggal" class="form-control" name="tanggal" placeholder="Tanggal" value="{{ @\Carbon\Carbon::parse($libur->tanggal)->format('Y-m-d') }}" required>
+                                    <input type="date" id="tanggal" class="form-control" name="tanggal" placeholder="Tanggal" value="{{ @$libur ? \Carbon\Carbon::parse($libur->tanggal)->format('Y-m-d') : '' }}"
                                 </div>
                             </div>
                             <div class="col-12">
@@ -69,19 +69,9 @@
 <script src="{{ asset('assets') }}/app-assets/vendors/js/tables/datatable/dataTables.rowGroup.min.js"></script>
 <script src="{{ asset('assets') }}/app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js"></script>
 <script>
-    $(document).ready(function () {
-        let table = $('.table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{{ url("api/get-libur/datatable") }}',
-                type: 'GET',
-            },
-            drawCallback: function( settings ) {
-                feather.replace()
-            }
-        }) 
-    });
+    $(document).ready(function(){
+
+});
 </script>
 @include('layouts.alerts')
 @endpush

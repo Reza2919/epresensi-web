@@ -28,6 +28,7 @@ use App\Http\Controllers\UserController;
 
 Route::get('/login', [AuthController::class, 'index'])->name('login-form');
 Route::get('/faq', [FaqController::class, 'index']);
+Route::get('/libur/delete/{id}', [LiburController::class,'destroy']) ->name('libur.delete');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/kebijakan-privasi', [ConfigController::class, 'kebijakanPrivasi'])->name('kebijakan-privasi');
 Route::get('sso-callback', [AuthController::class, 'ssoLogin']);
@@ -84,10 +85,17 @@ Route::middleware(['login'])->group(function () {
             Route::get('/presensi-log', [PresensiController::class, 'presensiLog'])->name('presensi-log.get');
         });
         Route::middleware(['role:admin,tu,pimpinan'])->group(function () {
-            Route::get('/pegawai', [PegawaiController::class, 'index'])->name('pegawai.index');
-            Route::get('/pegawai/{id}', [PegawaiController::class, 'show'])->name('pegawai.show');
-            Route::get('/jurnal/{id}', [PegawaiController::class, 'jurnal'])->name('pegawai.jurnal');
-            Route::get('/bidang/{satkerid}/{id_satker_bidang}', [KoordinatorController::class, 'showBidang'])->name('bidang.show');
+           Route::get('/pegawai', [PegawaiController::class, 'index'])->name('pegawai.index');
+
+Route::get('/pegawai/create', [PegawaiController::class, 'create']);
+Route::post('/pegawai/store', [PegawaiController::class, 'store']);
+
+Route::get('/pegawai/{id}', [PegawaiController::class, 'show'])->name('pegawai.show');
+Route::get('/pegawai/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
+
+Route::post('/pegawai/{id}/update', [PegawaiController::class, 'update'])->name('pegawai.update');
+Route::get('/pegawai/{id}/delete', [PegawaiController::class, 'delete'])->name('pegawai.delete');
+
             Route::delete('/bidang/{id_satker_bidang}', [KoordinatorController::class, 'destroy'])->name('bidang.destroy');
             Route::delete('/satker-user/{id_satker_user}/delete', [SatkerUserController::class, 'destroy']);
             Route::post('/koordinator/{satkerid}/generate', [KoordinatorController::class, 'generate'])->name('koordinator.generate');

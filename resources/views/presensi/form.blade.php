@@ -122,13 +122,13 @@
                             <div class="col-md-6">
                                 <div class="mt-2">
                                     <h5 class="mb-75">Foto Masuk:</h5>
-                                    <img src="{{ env('API_URL').'/'.$presensi->foto_masuk }}" alt="" style="width: 200px">
+                                    <img src="{{ asset('assets/app-assets/images/profile/default-user.jpg') }}"
                                 </div>
                             </div>
                             <div class="col-md-6 mb-2">
                                 <div class="mt-2">
                                     <h5 class="mb-75">Foto Keluar:</h5>
-                                    <img src="{{ env('API_URL').'/'.$presensi->foto_keluar }}" alt="" style="width: 200px">
+                                   <img src="{{ asset('assets/app-assets/images/profile/default-user.jpg') }}"
                                 </div>
                             </div>
                         </div>

@@ -40,23 +40,32 @@ class AuthController extends Controller
         }
     }
     public function login(Request $request)
-    {
-        $input = $request->all();
-        $res = API::post('auth/login', $input);
-        if (@$res->getStatusCode() == '200') {
-            $body = json_decode($res->getBody()->getContents());
-            $session['token'] = $body->data->token;
-            $tokenParts = explode(".", $body->data->token);
-            $tokenHeader = base64_decode($tokenParts[0]);
-            $tokenPayload = base64_decode($tokenParts[1]);
-            $jwtHeader = json_decode($tokenHeader);
-            $jwtPayload = json_decode($tokenPayload);
-            $session['userdata'] = $jwtPayload->user;
-            session($session);
-            return redirect('/');
-        }
-        return redirect()->back()->with('error', @$res->getStatusCode() . ' - ' . @$res->getReasonPhrase());
+{
+    if (
+        $request->email == 'reza290405@gmail.com' &&
+        $request->password == '123456'
+    ) {
+
+        session([
+            'userdata' => (object)[
+                'id_user' => 1,
+                'id_pegawai' => 1,
+                'name' => 'Muhammad Reza',
+                'email' => 'reza290405@gmail.com',
+                'role' => 'admin',
+                'satkerid' => '010103'
+            ],
+            'token' => 'dummy-token'
+        ]);
+
+        return redirect('/');
     }
+
+    return redirect()->back()->with(
+        'error',
+        'Email atau Password salah'
+    );
+}
 
     public function profil()
     {

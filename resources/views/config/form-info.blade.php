@@ -19,7 +19,7 @@
                     <h4 class="card-title">{{ @$config ? 'Ubah' : 'Tambah' }} Config</h4>
                 </div>
                 <div class="card-body">
-                    <form class="form form-vertical" method="POST" action="{{ @$config ? route('config.update',[$config->id_config]) : route('config.store') }}">
+                    <form class="form form-vertical" method="POST" action="{{ isset($config) && $config ? route('config.update',[$config->id_config]) : route('config.store') }}"
                         @csrf
                         @if (@$config)
                             @method('patch')

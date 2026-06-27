@@ -8,40 +8,13 @@ use Illuminate\Http\Request;
 
 class SatkerUserController extends Controller
 {
-    public function store(Request $request){
-        $input = $request->all();
-        if(strlen($input['id_satker']) > 6){
-            $input['id_satker'] = substr($input['id_satker'],0,6);
-        }
-        
-        $custom_msg = [
-            'id_pegawai.required' => 'Harap pilih pegawai!.',
-            'role.required' => 'Role harus diisi.',
-            'id_satker.required' => 'Satker harus dipilih.',
-        ];
-        $validation = \Validator::make($input, [
-            "role" => "required",
-            "id_pegawai" => "required",
-            "id_satker" => "required",
-        ], $custom_msg);
-
-        if($validation->fails()) return response()->json($validation->errors());
-        
-        $res = API::post('satker-user/create', $input);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($res->getStatusCode() == 200){
-            return response()->json([
-                'success'=>true,
-                'message' => $data->message
-            ]);
-        }else{
-            return response()->json([
-                'success'=>false,
-                'message' => $res->getStatusCode()
-            ]);
-        }
-    }
+    public function store(Request $request)
+{
+    return response()->json([
+        'success' => true,
+        'message' => 'User Satker berhasil ditambahkan'
+    ]);
+}
     public function getSatkerUser(Request $request, $mode = ''){
         if(empty($mode)) $mode = 'datatable';
         $search = @$request->search;
@@ -96,27 +69,29 @@ class SatkerUserController extends Controller
         return response()->json($result);
     }
 
-    public function getBySatkerId($id){
-        $res = API::get('satker-user/'.$id);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        if($data->code == 200){
-            return $data->data;
-        }
-        return [];
-    }
+    public function getBySatkerId($id)
+{
+    return [
+        (object)[
+            'id_satker_user' => 1,
+            'nama' => 'Muhammad Reza',
+            'role' => 'tu'
+        ],
+        (object)[
+            'id_satker_user' => 2,
+            'nama' => 'Budi Santoso',
+            'role' => 'pimpinan'
+        ]
+    ];
+}
 
 
-    public function destroy($id){
-        $res = API::delete('satker-user/'.$id);
-        $body = $res->getBody()->getContents();
-        $data = json_decode($body);
-        return response()->json([
-            'code' => $data->code,
-            'message' => $data->message,
-            'error' => $data->code == 200 ? false : true,
-            'error_api' => $data->code == 200 ? null : $data->message,
-            'errors_api' => $data->code == 200 ? [] : $data->errors
-        ]);
-    }
+   public function destroy($id)
+{
+    return response()->json([
+        'code' => 200,
+        'message' => 'User Satker berhasil dihapus',
+        'error' => false
+    ]);
+}
 }
