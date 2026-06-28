@@ -1,69 +1,33 @@
-FROM registry.gitlab.com/someah/presensi-kemnaker/presensi-kemnaker-web:php8.1-fpm
+FROM php:8.2-fpm
 
-ENV TZ="Asia/Jakarta"
-
-# Set working directory
 WORKDIR /var/www
 
-# Add docker php ext repo
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-
-# Install php extensions
-RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions pdo_pgsql gd zip
-
-# Install dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    git \
+    unzip \
+    zip \
+    curl \
+    libpq-dev \
+    libzip-dev \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    unzip \
-    git \
-    curl \
-    lua-zlib-dev \
-    libmemcached-dev \
-    nginx
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_pgsql zip gd
 
-# Install supervisor
-RUN apt-get install -y supervisor
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY . .
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN composer install --no-dev --optimize-autoloader
 
-# Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+RUN php artisan config:clear || true
+RUN php artisan cache:clear || true
+RUN php artisan route:clear || true
+RUN php artisan view:clear || true
 
-# Copy code to /var/www
-COPY --chown=www-data:www-data . /var/www
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# add root to www group
-RUN chmod -R ug+w /var/www/storage
+EXPOSE 8080
 
-# Copy configs
-COPY ./docker/php/custom-setting.ini /usr/local/etc/php/conf.d/
-COPY ./docker/supervisor.conf /etc/supervisor/conf.d/supervisord.conf
-ADD ./docker/nginx/vhost-prod.conf /etc/nginx/conf.d/default.conf
-RUN cp env.prod .env
-
-# PHP Error Log Files
-RUN mkdir /var/log/php
-RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
-
-# SETUP PHP-FPM CONFIG SETTINGS (max_children / max_requests)
-RUN echo 'pm.max_children = 15' >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
-    echo 'pm.max_requests = 500' >> /usr/local/etc/php-fpm.d/zz-docker.conf
-
-# Deployment steps
-RUN composer install
-
-EXPOSE 8000
-
-ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisor/supervisord.conf"]
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
