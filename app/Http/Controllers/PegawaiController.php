@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class PegawaiController extends Controller
 {
-    public function index(){
-        return view('pegawai.index', [
-            'satkers' => $this->getSatker()
-        ]);
-    }
+    public function index()
+{
+    return view('pegawai.index', [
+        'satkers' => []
+    ]);
+}
 
     /**
      * =========================
